@@ -134,9 +134,14 @@ export default function Home() {
 
       const decode = jwt.decode(token, { complete: true });
       const payload = decode?.payload;
-      if (payload.role == "Admin") throw new Error("Unautorized actions!");
+      if (payload === undefined) {
+        onCloseReserve();
+        throw new Error("Silahkan login terlebih dahulu");
+      }
 
-      const newInput = { ...inputRes, user_id: payload.id };
+      const userId =
+        typeof payload === "string" ? payload : (payload.id as string);
+      const newInput = { ...inputRes, user_id: userId };
 
       const insertData = await fetch("/api/v1/reservation", {
         method: "POST",

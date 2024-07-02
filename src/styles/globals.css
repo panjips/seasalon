@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.playfair {
+  font-family: var(--font-playfair-display);
+}
+
+.nanum {
+  font-family: var(--font-nanum-gothic);
+}

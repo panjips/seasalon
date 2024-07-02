@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String          @id @unique @default(uuid())
+  full_name     String
+  email         String          @unique
+  phone_number  String
+  password      String
+  role          String          @default("Customer")
+  created_at    DateTime        @default(now())
+  updated_at    DateTime        @updatedAt
+
+  refresh_token RefreshToken[]
+  reservation   Reservation[]
+}
+
+model RefreshToken {
+  id            String   @id @unique @default(uuid())
+  hashed_token  String
+  revoked       Boolean  @default(false)
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  user_id       String
+  User          User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model Review {
+  id            String   @id @unique @default(uuid())
+  name          String
+  rating        Int
+  comment       String
+  created_at    DateTime        @default(now())
+  updated_at    DateTime        @updatedAt
+}
+
+model Branch  {
+  id            String   @id @unique @default(uuid())
+  name          String
+  location      String
+  open_at       String
+  close_at      String
+  created_at    DateTime        @default(now())
+  updated_at    DateTime        @updatedAt
+
+  service       Service[]
+  reservation   Reservation[]
+}
+
+model Service {
+  id            String   @id @unique @default(uuid())
+  name          String
+  duration      String
+  created_at    DateTime        @default(now())
+  updated_at    DateTime        @updatedAt
+
+  reservation   Reservation[]
+
+  branch_id     String
+  Branch        Branch  @relation(fields: [branch_id], references: [id])
+}
+
+model Reservation {
+  id            String   @id @unique @default(uuid())
+  name          String
+  phone_number  String
+  datetime      String
+  created_at    DateTime        @default(now())
+  updated_at    DateTime        @updatedAt
+
+  service_id    String
+  Service       Service @relation(fields: [service_id], references: [id])
+
+  branch_id     String
+  Branch        Branch  @relation(fields: [branch_id], references: [id])
+
+  user_id       String
+  User          User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
